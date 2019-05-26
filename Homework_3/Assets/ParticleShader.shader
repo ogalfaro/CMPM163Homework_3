@@ -5,6 +5,7 @@
         _MainTex ("Texture", 2D) = "white" {}
         _StartColor("Start Color",Color) = (0,0,0,0)
         _EndColor("End Color", Color) = (0,0,0,0)
+        _Bend("Bend", Float) = 0
         //Define properties for Start and End Color
     }
     SubShader
@@ -35,14 +36,16 @@
             };
 
             sampler2D _MainTex;
-          
+            uniform float _Bend;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv; //Correct this for particle shader
-             
+                //v.vertex.xy += (_Bend/2*v.vertex.z);
+                v.vertex = v.vertex * _Bend;
+                o.vertex = UnityObjectToClipPos(v.vertex);
                 return o;
             }
             float4 _StartColor;
@@ -60,7 +63,7 @@
                 float4 end = col * _EndColor;
                 //Do a linear interpolation of start color and end color based on particle age percentage
                
-                return lerp(start,end,age);
+                return lerp(start,end,age);//*(col.a)*0.15;
             }
             ENDCG
         }
